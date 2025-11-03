@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dashboard Backtest Forex</title>
+  <title>Jurnal Forex</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
     :root {
       --bg-dark: #111;
@@ -15,38 +16,40 @@
       --profit: #00ff66;
       --loss: #ff3333;
       --border: #444;
+      --warning: #ffcc00;
     }
 
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; margin:0; padding:0; }
     body {
       font-family: 'Segoe UI', Arial, sans-serif;
-      margin: 0;
-      padding: 0;
       background-color: var(--bg-dark);
       color: var(--text);
       -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
+      line-height: 1.5;
     }
 
     header {
       background-color: var(--bg-panel);
       display: flex;
-      justify-content: center;
-      gap: 12px;
-      padding: 14px 10px;
-      border-bottom: 2px solid rgba(0,255,150,0.05);
+      flex-direction: column;
       align-items: center;
+      padding: 16px 10px;
+      border-bottom: 2px solid rgba(0,255,150,0.05);
       position: sticky;
       top: 0;
       z-index: 50;
+      gap: 12px;
     }
-    .title {
-      position: absolute;
-      left: 20px;
-      font-weight: 700;
+
+    .main-title {
+      font-weight: 800;
       color: var(--accent);
-      font-size: 18px;
+      font-size: 24px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin: 0;
     }
+
     .tabs {
       display: flex;
       gap: 8px;
@@ -60,15 +63,15 @@
       cursor: pointer;
       transition: .18s;
       font-size: 15px;
+      font-weight: 600;
     }
     .tabs button:hover { transform: translateY(-2px); }
     .tabs button.active {
-      background: linear-gradient(180deg, rgba(0,255,153,0.12), rgba(0,179,60,0.06));
+      background: var(--accent-light);
       color: #000;
-      background-color: var(--accent-light);
       font-weight: 700;
-      border: 1px solid rgba(0,255,150,0.12);
-      box-shadow: 0 6px 20px rgba(0,255,100,0.06);
+      border: 1px solid rgba(0,255,150,0.2);
+      box-shadow: 0 6px 20px rgba(0,255,100,0.1);
     }
 
     main {
@@ -86,17 +89,12 @@
     }
 
     .risk-box {
-      max-width: 100%;
-      margin: 10px auto 18px;
       background-color: var(--bg-deep);
       padding: 18px;
       border-radius: 12px;
       box-shadow: 0 0 10px rgba(0,255,100,0.06);
       text-align: center;
-    }
-    .risk-box input, .risk-box select {
-      width: 40%;
-      margin: 8px;
+      margin-bottom: 18px;
     }
     .value-box {
       display: inline-block;
@@ -117,14 +115,14 @@
       box-shadow: 0 0 12px rgba(0,255,100,0.03);
     }
 
-    form label {
+    label {
       display: block;
       margin-top: 10px;
       font-weight: 600;
       color: var(--text);
     }
 
-    input[type="date"], input[type="number"], input[type="text"], select, textarea, input[type="file"] {
+    input, select, textarea {
       width: 100%;
       padding: 10px;
       margin-top: 6px;
@@ -138,8 +136,9 @@
     input:focus, select:focus, textarea:focus {
       outline: none;
       border-color: var(--accent);
-      box-shadow: 0 0 8px rgba(0,255,150,0.06);
+      box-shadow: 0 0 8px rgba(0,255,150,0.1);
     }
+
     button.primary {
       background-color: var(--accent-light);
       color: #000;
@@ -149,6 +148,7 @@
       border-radius: 8px;
       font-weight: 700;
       margin-top: 6px;
+      width: 100%;
     }
     button.primary:hover { background-color: var(--accent); transform: scale(1.02); }
 
@@ -172,12 +172,12 @@
       border-radius: 10px;
       overflow: hidden;
       box-shadow: 0 0 10px rgba(0,255,0,0.02);
+      font-size: 13px;
     }
     th, td {
       padding: 10px;
       border: 1px solid var(--border);
       text-align: center;
-      font-size: 13px;
     }
     th { background-color: var(--accent-light); color: #000; font-weight: 700; }
     tr:nth-child(even) td { background-color: #2a2a2a; }
@@ -194,39 +194,23 @@
       text-align: center;
       box-shadow: 0 0 10px rgba(0,255,0,0.02);
     }
-    .totals span { display:inline-block; margin: 0 12px; font-weight:700; color:var(--text); }
+    .totals span { display:inline-block; margin: 0 12px; font-weight:700; }
 
     .export-buttons { text-align: center; margin-top: 12px; }
     .export-buttons button { margin: 6px; padding: 8px 12px; border-radius: 6px; border: none; cursor: pointer; background:#00cc66; color:#000; font-weight:700; }
 
     img.screenshot {
-      width: 78px;
-      height: 50px;
-      object-fit: cover;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: transform .15s, box-shadow .15s;
-      border: 1px solid rgba(255,255,255,0.03);
+      width: 78px; height: 50px; object-fit: cover; border-radius: 6px; cursor: pointer;
+      transition: transform .15s, box-shadow .15s; border: 1px solid rgba(255,255,255,0.03);
     }
     img.screenshot:hover { transform: scale(1.12); box-shadow: 0 6px 20px rgba(0,255,120,0.06); }
 
     .modal {
-      position: fixed;
-      inset: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0,0,0,0.7);
-      z-index: 2000;
+      position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.8); z-index: 2000;
     }
     .modal.active { display: flex; }
-    .modal .box {
-      max-width: 92%;
-      max-height: 90%;
-      background: var(--bg-panel);
-      padding: 10px;
-      border-radius: 8px;
-    }
+    .modal .box { max-width: 92%; max-height: 90%; background: var(--bg-panel); padding: 10px; border-radius: 8px; }
     .modal img { max-width: 100%; max-height: 80vh; display: block; border-radius: 6px; }
 
     .notulen-wrap {
@@ -237,26 +221,11 @@
       border-radius: 12px;
     }
     .notulen-header {
-      display:flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
+      display:flex; justify-content: space-between; align-items: Crunch; gap: 10px; margin-bottom: 10px;
     }
-    .notulen-header .date {
-      color: var(--text);
-      font-weight: 700;
-    }
-    textarea#notulenArea {
-      width: 100%;
-      min-height: 220px;
-      background: #2a2a2a;
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 10px;
-      border-radius: 8px;
-      resize: vertical;
-    }
+    .notulen-header .date { color: var(--text); font-weight: 700; }
+    textarea#notulenArea { width: 100%; min-height: 220px; background: #2a2a2a; border: 1px solid var(--border); color: var(--text); padding: 10px; border-radius: 8px; resize: vertical; }
+
     .checklist {
       margin-top: 12px;
       background: var(--bg-deep);
@@ -265,33 +234,35 @@
     }
     .checklist h3 { margin: 6px 0 12px 0; }
     .checklist-item {
-      display:flex;
-      gap:10px;
-      align-items:center;
-      background: #191919;
-      padding: 8px;
-      border-radius: 6px;
-      margin-bottom: 8px;
+      display:flex; gap:10px; align-items:center; background: #191919; padding: 8px; border-radius: 6px; margin-bottom: 8px;
+      cursor: move;
     }
     .checklist-item span { flex:1; color:var(--text); outline: none; min-height:18px; }
     .checklist-item input[type="checkbox"] { transform:scale(1.25); }
     .checklist-item button.del { background:none; border:none; color:var(--loss); font-size:18px; cursor:pointer; }
+
     .add-btn { background:var(--accent); color:#000; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; font-weight:700; }
 
     .action-btn {
-      background: none;
-      border: none;
-      font-size: 16px;
-      cursor: pointer;
-      padding: 2px 6px;
-      border-radius: 4px;
+      background: none; border: none; font-size: 16px; cursor: pointer; padding: 2px 6px; border-radius: 4px;
     }
     .edit-btn { color: #00ccff; }
     .delete-btn { color: #ff5555; }
 
+    .dark-toggle {
+      position: absolute;
+      left: 20px;
+      top: 16px;
+      background: none;
+      border: none;
+      color: var(--accent);
+      font-size: 20px;
+      cursor: pointer;
+    }
+
     @media (max-width: 820px) {
-      .risk-box input, .risk-box select { width: 100%; }
-      .title { position: static; text-align: center; }
+      .main-title { font-size: 20px; }
+      .dark-toggle { position: static; margin-bottom: 8px; }
       header { padding: 12px 10px; gap:6px; }
       main { padding: 12px; }
       img.screenshot { width: 64px; height: 44px; }
@@ -301,33 +272,30 @@
 </head>
 <body>
   <header>
-    <div class="title">Dashboard Backtest Forex</div>
-    <div class="tabs" role="tablist" aria-label="Main Tabs">
-      <button id="tabJurnal" class="active" role="tab">Jurnal Backtest</button>
-      <button id="tabNotulen" role="tab">Notulen & Ceklis</button>
+    <button class="dark-toggle" id="darkToggle" title="Toggle Dark Mode"><i class="fas fa-moon"></i></button>
+    <h1 class="main-title">JURNAL FOREX</h1>
+    <div class="tabs" role="tablist">
+      <button id="tabJurnal" class="active">JURNAL</button>
+      <button id="tabNotulen">NOTULEN & CEKLIS</button>
     </div>
   </header>
 
   <main>
-    <!-- === SECTION: JURNAL BACKTEST === -->
-    <section id="sectionJurnal" class="section active" aria-labelledby="tabJurnal">
+    <!-- JURNAL BACKTEST -->
+    <section id="sectionJurnal" class="section active">
       <div class="risk-box">
         <h3 style="margin:0 0 8px 0; color:var(--accent)">Modal & Manajemen Risiko</h3>
-        <input type="number" id="modalAwal" placeholder="Masukkan modal awal ($)" step="0.01">
-        <br>
-        <label for="riskSelect" style="margin-top:8px;">Risk Per Trade (%)</label>
+        <input type="number" id="modalAwal" placeholder="Masukkan modal awal ($)" step="0.01" value="10000">
+        <label for="riskSelect">Risk Per Trade (%)</label>
         <select id="riskSelect">
           <option value="1">1%</option>
-          <option value="2">2%</option>
+          <option value="2" selected>2%</option>
           <option value="3">3%</option>
           <option value="5">5%</option>
         </select>
         <div style="margin-top:10px;">
-          <span class="value-box">Risk $<span id="riskValue">0.00</span></span>
-        </div>
-        <div style="margin-top:12px;">
-          <span class="value-box">Total P&L: $<span id="totalPLDisplay">0.00</span></span>
-          <span class="value-box">Balance: $<span id="balanceDisplay">0.00</span></span>
+          <span class="value-box">Risk: $<span id="riskValue">200.00</span></span>
+          <span class="value-box">Balance: $<span id="balanceDisplay">10000.00</span></span>
         </div>
       </div>
 
@@ -338,6 +306,7 @@
         <label for="pair">Pair Forex:</label>
         <select id="pair" required>
           <option value="">-- Pilih Pair --</option>
+          <option value="XAU/USD">XAU/USD</option>
           <option value="EUR/USD">EUR/USD</option>
           <option value="GBP/USD">GBP/USD</option>
           <option value="USD/JPY">USD/JPY</option>
@@ -348,16 +317,16 @@
         </select>
 
         <label for="strategy">Strategi:</label>
-        <input type="text" id="strategy" placeholder="Masukkan strategi yang digunakan" required>
+        <input type="text" id="strategy" placeholder="Contoh: Breakout + RSI" required>
 
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
           <div>
             <label for="entry">Entry Point:</label>
-            <input type="number" id="entry" step="0.0001" required>
+            <input type="number" id="entry" step="0.00001" required>
           </div>
           <div>
             <label for="exit">Exit Point:</label>
-            <input type="number" id="exit" step="0.0001" required>
+            <input type="number" id="exit" step="0.00001" required>
           </div>
         </div>
 
@@ -369,12 +338,12 @@
         </select>
 
         <label for="amount">Jumlah Profit/Loss ($):</label>
-        <input type="number" id="amount" step="0.01" placeholder="Masukkan jumlah profit atau loss" required>
+        <input type="number" id="amount" step="0.01" placeholder="Contoh: 150.50" required>
 
         <label for="notes">Catatan:</label>
-        <textarea id="notes" rows="3" placeholder="Tambahkan catatan jika diperlukan"></textarea>
+        <textarea id="notes" rows="3" placeholder="Alasan entry, kesalahan, dll..."></textarea>
 
-        <label for="screenshot">Upload Screenshot Analisa (opsional):</label>
+        <label for="screenshot">Upload Screenshot (opsional):</label>
         <input type="file" id="screenshot" accept="image/*">
 
         <button type="submit" class="primary">Simpan Jurnal</button>
@@ -382,8 +351,8 @@
 
       <canvas id="profitChart"></canvas>
 
-      <h2 style="text-align:center; color:var(--accent); margin-top:8px;">Riwayat Transaksi</h2>
-      <table id="historyTable" aria-describedby="Riwayat Transaksi">
+      <h2 style="text-align:center; color:var(--accent); margin:18px 0 8px;">Riwayat Transaksi</h2>
+      <table id="historyTable">
         <thead>
           <tr>
             <th>Tanggal</th>
@@ -391,10 +360,11 @@
             <th>Strategi</th>
             <th>Entry</th>
             <th>Exit</th>
+            <th>R:R</th>
             <th>Hasil</th>
-            <th>Jumlah ($)</th>
+            <th>P&L ($)</th>
             <th>Catatan</th>
-            <th>Screenshot</th>
+            <th>SS</th>
             <th>Aksi</th>
           </tr>
         </thead>
@@ -402,36 +372,36 @@
       </table>
 
       <div class="totals">
-        <h3 style="margin:6px 0 8px 0; color:var(--accent)">Total Akumulasi</h3>
+        <h3 style="margin:6px 0 8px 0; color:var(--accent)">Statistik Akumulasi</h3>
         <span class="profit">Profit: $<span id="totalProfit">0</span></span>
         <span class="loss">Loss: $<span id="totalLoss">0</span></span>
         <span>Win Rate: <span id="winRate">0%</span></span>
-        <span>Rata-rata RR: <span id="avgRR">0.00</span></span>
-        <span>Saldo Akhir: $<span id="netResult">0</span></span>
+        <span>Rata-rata R:R: <span id="avgRR">0.00</span></span>
+        <span>Net P&L: $<span id="netResult">0</span></span>
       </div>
 
       <div class="export-buttons">
-        <button id="exportExcel">Ekspor ke Excel</button>
-        <button id="exportPDF">Ekspor ke PDF</button>
-        <button id="clearAll" style="background:#ff6666;color:#fff;border:none;padding:8px 12px;border-radius:6px;">Reset Semua</button>
+        <button id="exportExcel">Ekspor Excel</button>
+        <button id="exportPDF">Ekspor PDF</button>
+        <button id="clearAll" style="background:#ff6666;color:#fff;">Reset Semua</button>
       </div>
     </section>
 
-    <!-- === SECTION: NOTULEN & CEKLIS === -->
-    <section id="sectionNotulen" class="section" aria-labelledby="tabNotulen">
+    <!-- NOTULEN & CEKLIS -->
+    <section id="sectionNotulen" class="section">
       <div class="notulen-wrap">
         <div class="notulen-header">
           <div style="display:flex;gap:12px;align-items:center;">
-            <h2 style="margin:0;color:var(--accent)">Notulen</h2>
-            <div class="date" id="notulenDate"></div>
+            <h2 style="margin:0;color:var(--accent)">Notulen Harian</h2>
+            <select id="notulenDateSelect" style="padding:6px;border-radius:6px;background:#2a2a2a;color:var(--text);border:1px solid var(--border);"></select>
           </div>
           <div>
-            <button id="saveNotulenBtn" class="add-btn" title="Simpan sekarang">Simpan</button>
-            <button id="clearNotulenBtn" class="add-btn" style="background:#f55;color:#fff;margin-left:8px;">Hapus Notulen</button>
+            <button id="saveNotulenBtn" class="add-btn">Simpan</button>
+            <button id="newNotulenBtn" class="add-btn" style="background:#00ccff;">+ Baru</button>
           </div>
         </div>
 
-        <textarea id="notulenArea" placeholder="Tulis notulen atau catatan penting di sini..."></textarea>
+        <textarea id="notulenArea" placeholder="Tulis notulen hari ini..."></textarea>
 
         <div class="checklist">
           <h3>Daftar Ceklis</h3>
@@ -443,22 +413,22 @@
     </section>
   </main>
 
-  <!-- Image modal -->
-  <div id="imgModal" class="modal" role="dialog" aria-hidden="true">
+  <!-- Modal Gambar -->
+  <div id="imgModal" class="modal">
     <div class="box">
-      <button id="closeModal" style="float:right;background:none;border:none;color:var(--accent);font-weight:700;cursor:pointer;margin-bottom:6px;">X</button>
-      <img id="modalImg" src="" alt="Screenshot penuh">
+      <button id="closeModal" style="float:right;background:none;border:none;color:var(--accent);font-weight:700;cursor:pointer;">X</button>
+      <img id="modalImg" src="" alt="Screenshot">
     </div>
   </div>
 
-  <!-- External libs -->
+  <!-- Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.0/jspdf.plugin.autotable.min.js"></script>
 
   <script>
-    // ------------- TAB NAV -------------
+    // === TAB NAVIGATION ===
     const tabJurnal = document.getElementById('tabJurnal');
     const tabNotulen = document.getElementById('tabNotulen');
     const sectionJurnal = document.getElementById('sectionJurnal');
@@ -473,37 +443,27 @@
       tabNotulen.classList.add('active'); tabJurnal.classList.remove('active');
       sectionNotulen.classList.add('active'); sectionJurnal.classList.remove('active');
       history.replaceState(null, '', '#notulen');
+      loadNotulenForDate();
     }
 
     tabJurnal.addEventListener('click', showJurnal);
     tabNotulen.addEventListener('click', showNotulen);
     if (location.hash === '#notulen') showNotulen();
 
-    // ------------- Journal Functionality -------------
+    // === CHART ===
     const ctx = document.getElementById('profitChart').getContext('2d');
-    const profitData = { labels: [], datasets: [{ label: 'Perkembangan Saldo ($)', data: [], borderColor: '#00ff66', backgroundColor: 'rgba(0,255,100,0.12)', borderWidth: 2, tension: 0.3 }] };
-    const chart = new Chart(ctx, { type: 'line', data: profitData, options: { responsive: true, scales: { y: { beginAtZero: true } } } });
+    const profitData = { labels: [], datasets: [{ label: 'Saldo ($)', data: [], borderColor: '#00ff66', backgroundColor: 'rgba(0,255,100,0.1)', borderWidth: 2, tension: 0.3 }] };
+    const chart = new Chart(ctx, { type: 'line', data: profitData, options: { responsive: true, scales: { y: { beginAtZero: false } } } });
 
-    let totalProfit = 0, totalLoss = 0, modalAwal = 0;
-    let totalTrades = 0, winTrades = 0, totalRR = 0;
+    // === STATE ===
+    let modalAwal = 10000, totalProfit = 0, totalLoss = 0, totalTrades = 0, winTrades = 0, totalRR = 0;
 
     const modalInput = document.getElementById('modalAwal');
     const riskSelect = document.getElementById('riskSelect');
     const riskValueDisplay = document.getElementById('riskValue');
-    const totalPLDisplay = document.getElementById('totalPLDisplay');
     const balanceDisplay = document.getElementById('balanceDisplay');
-    const form = document.getElementById('jurnalForm');
     const tbody = document.querySelector('#historyTable tbody');
-
-    const dateInput = document.getElementById('date');
-    const pairInput = document.getElementById('pair');
-    const strategyInput = document.getElementById('strategy');
-    const entryInput = document.getElementById('entry');
-    const exitInput = document.getElementById('exit');
-    const resultTypeInput = document.getElementById('resultType');
-    const amountInput = document.getElementById('amount');
-    const notesInput = document.getElementById('notes');
-    const screenshotInput = document.getElementById('screenshot');
+    const form = document.getElementById('jurnalForm');
 
     const totalProfitEl = document.getElementById('totalProfit');
     const totalLossEl = document.getElementById('totalLoss');
@@ -511,302 +471,324 @@
     const avgRREl = document.getElementById('avgRR');
     const netResultEl = document.getElementById('netResult');
 
+    // === UTILS ===
+    function formatDate(date) {
+      const d = new Date(date);
+      return d.toISOString().split('T')[0];
+    }
+    function today() { return formatDate(new Date()); }
+
     function updateRisk() {
       modalAwal = parseFloat(modalInput.value) || 0;
       const riskPercent = parseFloat(riskSelect.value);
-      riskValueDisplay.textContent = ((modalAwal * riskPercent) / 100).toFixed(2);
+      const risk = (modalAwal * riskPercent) / 100;
+      riskValueDisplay.textContent = risk.toFixed(2);
       updateStats();
     }
 
     function updateStats() {
-      const totalPL = totalProfit - totalLoss;
-      const balance = modalAwal + totalPL;
-      totalPLDisplay.textContent = totalPL.toFixed(2);
+      const net = totalProfit - totalLoss;
+      const balance = modalAwal + net;
       balanceDisplay.textContent = balance.toFixed(2);
-      netResultEl.textContent = balance.toFixed(2);
-
+      netResultEl.textContent = net.toFixed(2);
+      totalProfitEl.textContent = totalProfit.toFixed(2);
+      totalLossEl.textContent = totalLoss.toFixed(2);
       winRateEl.textContent = totalTrades > 0 ? ((winTrades / totalTrades) * 100).toFixed(1) + '%' : '0%';
       avgRREl.textContent = totalTrades > 0 ? (totalRR / totalTrades).toFixed(2) : '0.00';
     }
 
     function rebuildChart() {
-      profitData.labels = [];
-      profitData.datasets[0].data = [];
+      profitData.labels = ['Awal'];
+      profitData.datasets[0].data = [modalAwal];
       let balance = modalAwal;
-      profitData.labels.push('Awal');
-      profitData.datasets[0].data.push(balance);
-
       tbody.querySelectorAll('tr').forEach(row => {
-        const pl = parseFloat(row.cells[6].textContent);
+        const pl = parseFloat(row.cells[7].textContent);
         balance += pl;
-        const date = row.cells[0].textContent;
-        profitData.labels.push(date);
+        profitData.labels.push(row.cells[0].textContent);
         profitData.datasets[0].data.push(balance);
       });
       chart.update();
     }
 
-    function saveData() {
-      localStorage.setItem('jurnalData', tbody.innerHTML);
-      localStorage.setItem('chartData', JSON.stringify(profitData));
+    function saveAll() {
+      localStorage.setItem('jurnalHTML', tbody.innerHTML);
       localStorage.setItem('stats', JSON.stringify({ totalProfit, totalLoss, totalTrades, winTrades, totalRR }));
-      localStorage.setItem('modalAwal', modalInput.value || '');
-      localStorage.setItem('riskSelect', riskSelect.value || '1');
+      localStorage.setItem('modalAwal', modalAwal);
+      localStorage.setItem('riskSelect', riskSelect.value);
     }
 
-    function loadData() {
-      const savedModal = localStorage.getItem('modalAwal');
-      if (savedModal !== null) modalInput.value = savedModal;
-      const savedRisk = localStorage.getItem('riskSelect');
-      if (savedRisk) riskSelect.value = savedRisk;
+    function loadAll() {
+      modalInput.value = localStorage.getItem('modalAwal') || '10000';
+      riskSelect.value = localStorage.getItem('riskSelect') || '2';
       updateRisk();
 
-      const savedRows = localStorage.getItem('jurnalData');
-      if (savedRows) tbody.innerHTML = savedRows;
+      const saved = localStorage.getItem('jurnalHTML');
+      if (saved) tbody.innerHTML = saved;
 
-      const savedStats = JSON.parse(localStorage.getItem('stats') || 'null');
-      if (savedStats) {
-        totalProfit = savedStats.totalProfit || 0;
-        totalLoss = savedStats.totalLoss || 0;
-        totalTrades = savedStats.totalTrades || 0;
-        winTrades = savedStats.winTrades || 0;
-        totalRR = savedStats.totalRR || 0;
-        totalProfitEl.textContent = totalProfit.toFixed(2);
-        totalLossEl.textContent = totalLoss.toFixed(2);
-      }
+      const stats = JSON.parse(localStorage.getItem('stats') || '{}');
+      totalProfit = stats.totalProfit || 0;
+      totalLoss = stats.totalLoss || 0;
+      totalTrades = stats.totalTrades || 0;
+      winTrades = stats.winTrades || 0;
+      totalRR = stats.totalRR || 0;
 
       rebuildChart();
       updateStats();
-      attachImageClickHandlers();
       attachRowActions();
+      attachImageClickHandlers();
     }
 
-    window.addEventListener('load', loadData);
-    modalInput.addEventListener('input', updateRisk);
-    riskSelect.addEventListener('change', updateRisk);
-
-    // Submit jurnal
+    // === FORM SUBMIT ===
     form.addEventListener('submit', e => {
       e.preventDefault();
-      if (amountInput.value <= 0) { alert("Jumlah harus lebih dari 0!"); return; }
+      const amount = parseFloat(document.getElementById('amount').value);
+      if (amount <= 0) return alert('Jumlah harus > 0!');
 
-      const date = dateInput.value;
-      const pair = pairInput.value;
-      const strategy = strategyInput.value;
-      const entry = entryInput.value;
-      const exit = exitInput.value;
-      const resultType = resultTypeInput.value;
-      const amount = parseFloat(amountInput.value);
-      const notes = notesInput.value || '';
-      const screenshotFile = screenshotInput.files[0];
+      const risk = (modalAwal * parseFloat(riskSelect.value)) / 100;
+      const rr = risk > 0 ? amount / risk : 0;
 
-      const profitValue = resultType === 'Loss' ? -amount : amount;
-      const riskAmount = (modalAwal * parseFloat(riskSelect.value)) / 100;
-      const rr = riskAmount > 0 ? amount / riskAmount : 0;
+      const row = document.createElement('tr');
+      const result = document.getElementById('resultType').value;
+      const pl = result === 'Loss' ? -amount : amount;
 
-      totalTrades++;
-      if (resultType === 'Profit') {
-        winTrades++;
-        totalProfit += amount;
+      row.innerHTML = `
+        <td>${document.getElementById('date').value}</td>
+        <td>${document.getElementById('pair').value}</td>
+        <td>${document.getElementById('strategy').value}</td>
+        <td>${document.getElementById('entry').value}</td>
+        <td>${document.getElementById('exit').value}</td>
+        <td>${rr.toFixed(2)}</td>
+        <td class="${result === 'Profit' ? 'profit' : 'loss'}">${result}</td>
+        <td class="${result === 'Profit' ? 'profit' : 'loss'}">${pl.toFixed(2)}</td>
+        <td style="max-width:180px;white-space:pre-wrap;">${escapeHtml(document.getElementById('notes').value)}</td>
+        <td id="ssCell">-</td>
+        <td>
+          <button class="action-btn edit-btn" title="Edit">Edit</button>
+          <button class="action-btn delete-btn" title="Hapus">Delete</button>
+        </td>
+      `;
+
+      const file = document.getElementById('screenshot').files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          row.querySelector('#ssCell').innerHTML = `<img src="${e.target.result}" class="screenshot" alt="SS">`;
+          tbody.appendChild(row);
+          finalizeAdd(pl, result, rr);
+        };
+        reader.readAsDataURL(file);
       } else {
-        totalLoss += amount;
-      }
-      totalRR += rr;
-
-      const addRow = (imageBase64 = '') => {
-        const imgTag = imageBase64 ? `<img src="${imageBase64}" class="screenshot" alt="Screenshot">` : '-';
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${date}</td>
-          <td>${pair}</td>
-          <td>${strategy}</td>
-          <td>${entry}</td>
-          <td>${exit}</td>
-          <td class="${resultType === 'Profit' ? 'profit' : 'loss'}">${resultType}</td>
-          <td class="${resultType === 'Profit' ? 'profit' : 'loss'}">${profitValue.toFixed(2)}</td>
-          <td style="max-width:200px;white-space:pre-wrap;word-break:break-word;">${escapeHtml(notes)}</td>
-          <td>${imgTag}</td>
-          <td>
-            <button class="action-btn edit-btn" title="Edit">Edit</button>
-            <button class="action-btn delete-btn" title="Hapus">Delete</button>
-          </td>
-        `;
         tbody.appendChild(row);
+        finalizefinalizeAdd(pl, result, rr);
+      }
+
+      function finalizeAdd(pl, result, rr) {
+        totalTrades++;
+        if (result === 'Profit') { totalProfit += amount; winTrades++; } else { totalLoss += amount; }
+        totalRR += rr;
         rebuildChart();
         updateStats();
-        saveData();
+        saveAll();
         attachRowActions();
         attachImageClickHandlers();
         form.reset();
-      };
-
-      if (screenshotFile) {
-        const reader = new FileReader();
-        reader.onload = e2 => addRow(e2.target.result);
-        reader.readAsDataURL(screenshotFile);
-      } else {
-        addRow();
+        document.getElementById('date').value = today();
       }
     });
 
-    function escapeHtml(unsafe) {
-      return unsafe
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
     }
 
-    // Row Actions: Edit & Delete
+    // === ROW ACTIONS ===
     function attachRowActions() {
       tbody.querySelectorAll('tr').forEach(row => {
-        const editBtn = row.querySelector('.edit-btn');
-        const deleteBtn = row.querySelector('.delete-btn');
-
-        if (editBtn && !editBtn.dataset.listener) {
-          editBtn.dataset.listener = 'true';
-          editBtn.addEventListener('click', () => editRow(row));
+        const edit = row.querySelector('.edit-btn');
+        const del = row.querySelector('.delete-btn');
+        if (edit && !edit.dataset.bound) {
+          edit.dataset.bound = '1';
+          edit.onclick = () => editRow(row);
         }
-        if (deleteBtn && !deleteBtn.dataset.listener) {
-          deleteBtn.dataset.listener = 'true';
-          deleteBtn.addEventListener('click', () => deleteRow(row));
+        if (del && !del.dataset.bound) {
+          del.dataset.bound = '1';
+          del.onclick = () => deleteRow(row);
         }
       });
     }
 
     function editRow(row) {
       const cells = row.cells;
-      dateInput.value = cells[0].textContent;
-      pairInput.value = cells[1].textContent;
-      strategyInput.value = cells[2].textContent;
-      entryInput.value = cells[3].textContent;
-      exitInput.value = cells[4].textContent;
-      resultTypeInput.value = cells[5].textContent;
-      amountInput.value = Math.abs(parseFloat(cells[6].textContent)).toFixed(2);
-      notesInput.value = cells[7].innerText;
-
+      document.getElementById('date').value = cells[0].textContent;
+      document.getElementById('pair').value = cells[1].textContent;
+      document.getElementById('strategy').value = cells[2].textContent;
+      document.getElementById('entry').value = cells[3].textContent;
+      document.getElementById('exit').value = cells[4].textContent;
+      document.getElementById('resultType').value = cells[6].textContent;
+      document.getElementById('amount').value = Math.abs(parseFloat(cells[7].textContent)).toFixed(2);
+      document.getElementById('notes').value = cells[8].innerText;
       deleteRow(row);
     }
 
     function deleteRow(row) {
       if (!confirm('Hapus transaksi ini?')) return;
-      const pl = parseFloat(row.cells[6].textContent);
-      const resultType = row.cells[5].textContent;
-
-      if (resultType === 'Profit') {
-        totalProfit -= Math.abs(pl);
-        winTrades--;
-      } else {
-        totalLoss -= Math.abs(pl);
-      }
+      const pl = parseFloat(row.cells[7].textContent);
+      const result = row.cells[6].textContent;
+      const rr = parseFloat(row.cells[5].textContent);
+      if (result === 'Profit') { totalProfit -= Math.abs(pl); winTrades--; } else { totalLoss -= Math.abs(pl); }
       totalTrades--;
-      const riskAmount = (modalAwal * parseFloat(riskSelect.value)) / 100;
-      const rr = riskAmount > 0 ? Math.abs(pl) / riskAmount : 0;
       totalRR -= rr;
-
       row.remove();
       rebuildChart();
       updateStats();
-      saveData();
+      saveAll();
     }
 
-    // Export & Reset
-    document.getElementById('exportExcel').addEventListener('click', () => {
-      const table = document.getElementById('historyTable');
-      const wb = XLSX.utils.table_to_book(table, { sheet: 'Jurnal Backtest' });
-      XLSX.writeFile(wb, 'Jurnal_Backtest_Forex.xlsx');
-    });
+    // === EXPORT ===
+    document.getElementById('exportExcel').onclick = () => {
+      const wb = XLSX.utils.table_to_book(document.getElementById('historyTable'));
+      XLSX.writeFile(wb, 'Jurnal_Forex.xlsx');
+    };
 
-    document.getElementById('exportPDF').addEventListener('click', () => {
+    document.getElementById('exportPDF').onclick = () => {
       const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ orientation: 'landscape' });
-      doc.setFontSize(16);
-      doc.text('Jurnal Backtest Forex', 140, 15, null, null, 'center');
-      doc.autoTable({ html: '#historyTable', startY: 25, styles: { fontSize: 9 }, theme: 'grid', headStyles: { fillColor: [0, 204, 102] } });
-      doc.save('Jurnal_Backtest_Forex.pdf');
-    });
+      const doc = new jsPDF('l');
+      doc.text('Jurnal Forex', 140, 15, null, null, 'center');
+      doc.autoTable({ html: '#historyTable', startY: 25 });
+      doc.save('Jurnal_Forex.pdf');
+    };
 
-    document.getElementById('clearAll').addEventListener('click', () => {
-      if (!confirm('Yakin ingin menghapus semua data?')) return;
-      localStorage.clear();
-      location.reload();
-    });
+    document.getElementById('clearAll').onclick = () => {
+      if (confirm('Yakin reset SEMUA data?')) {
+        localStorage.clear();
+        location.reload();
+      }
+    };
 
-    // Image modal
-    const imgModal = document.getElementById('imgModal');
+    // === IMAGE MODAL ===
+    const modal = document.getElementById('imgModal');
     const modalImg = document.getElementById('modalImg');
-    const closeModal = document.getElementById('closeModal');
-
     function attachImageClickHandlers() {
       document.querySelectorAll('img.screenshot').forEach(img => {
         img.onclick = () => {
           modalImg.src = img.src;
-          imgModal.classList.add('active');
-          imgModal.setAttribute('aria-hidden', 'false');
+          modal.classList.add('active');
         };
       });
     }
+    document.getElementById('closeModal').onclick = () => modal.classList.remove('active');
+    modal.onclick = e => { if (e.target === modal) modal.classList.remove('active'); };
 
-    closeModal.addEventListener('click', () => {
-      imgModal.classList.remove('active');
-      imgModal.setAttribute('aria-hidden', 'true');
-    });
-    imgModal.addEventListener('click', e => {
-      if (e.target === imgModal) closeModal.click();
-    });
-
-    // Notulen & Checklist
+    // === NOTULEN MULTI-DAY ===
     const notulenArea = document.getElementById('notulenArea');
-    const notulenDate = document.getElementById('notulenDate');
-    const saveNotulenBtn = document.getElementById('saveNotulenBtn');
-    const clearNotulenBtn = document.getElementById('clearNotulenBtn');
-
-    function formatDateID(date = new Date()) {
-      const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-      return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
-    }
-    notulenDate.textContent = `Notulen Tanggal: ${formatDateID()}`;
-
-    notulenArea.value = localStorage.getItem('notulenText') || '';
-    notulenArea.addEventListener('input', () => localStorage.setItem('notulenText', notulenArea.value));
-    saveNotulenBtn.addEventListener('click', () => { localStorage.setItem('notulenText', notulenArea.value); alert('Notulen disimpan.'); });
-    clearNotulenBtn.addEventListener('click', () => { if (confirm('Hapus notulen?')) { notulenArea.value = ''; localStorage.removeItem('notulenText'); } });
-
+    const notulenDateSelect = document.getElementById('notulenDateSelect');
     const checklistContainer = document.getElementById('checklistContainer');
-    const addChecklistBtn = document.getElementById('addChecklistBtn');
-    const clearChecklistBtn = document.getElementById('clearChecklistBtn');
 
-    function loadChecklist() {
-      const saved = JSON.parse(localStorage.getItem('checklistData') || '[]');
-      checklistContainer.innerHTML = '';
-      saved.forEach(item => createChecklistItem(item.text, item.done));
-    }
+    function getNotulenKey(date) { return `notulen_${date}`; }
+    function getChecklistKey(date) { return `checklist_${date}`; }
 
-    function saveChecklist() {
-      const data = [];
-      checklistContainer.querySelectorAll('.checklist-item').forEach(node => {
-        data.push({ text: node.querySelector('span').textContent, done: node.querySelector('input[type="checkbox"]').checked });
+    function populateDateSelect() {
+      const dates = Object.keys(localStorage).filter(k => k.startsWith('notulen_')).map(k => k.replace('notulen_', ''));
+      notulenDateSelect.innerHTML = '';
+      dates.sort().reverse().forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d;
+        opt.textContent = new Date(d).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+        notulenDateSelect.appendChild(opt);
       });
-      localStorage.setItem('checklistData', JSON.stringify(data));
+      if (!dates.includes(today())) {
+        const opt = document.createElement('option');
+        opt.value = today();
+        opt.textContent = 'Hari Ini';
+        opt.selected = true;
+        notulenDateSelect.prepend(opt);
+      }
     }
 
-    function createChecklistItem(text = 'Item baru', done = false) {
+    function loadNotulenForDate() {
+      const date = notulenDateSelect.value || today();
+      notulenArea.value = localStorage.getItem(getNotulenKey(date)) || '';
+      loadChecklist(date);
+      populateDateSelect();
+    }
+
+    function saveNotulen() {
+      const date = notulenDateSelect.value || today();
+      localStorage.setItem(getNotulenKey(date), notulenArea.value);
+      saveChecklist(date);
+      alert('Notulen tersimpan!');
+    }
+
+    document.getElementById('saveNotulenBtn').onclick = saveNotulen;
+    document.getElementById('newNotulenBtn').onclick = () => {
+      notulenDateSelect.value = today();
+      notulenArea.value = '';
+      checklistContainer.innerHTML = '';
+      saveNotulen();
+      loadNotulenForDate();
+    };
+
+    // === CHECKLIST ===
+    function createChecklistItem(text = 'Item baru', done = false, date) {
       const div = document.createElement('div');
       div.className = 'checklist-item';
-      div.innerHTML = `<input type="checkbox" ${done ? 'checked' : ''}><span contenteditable="true">${text}</span><button class="del" title="Hapus">×</button>`;
-      div.querySelector('input[type="checkbox"]').addEventListener('change', saveChecklist);
-      div.querySelector('span').addEventListener('input', saveChecklist);
-      div.querySelector('button.del').addEventListener('click', () => { div.remove(); saveChecklist(); });
+      div.draggable = true;
+      div.innerHTML = `<input type="checkbox" ${done?'checked':''}><span contenteditable="true">${text}</span><button class="del">×</button>`;
+      div.querySelector('input').onchange = () => saveChecklist(date);
+      div.querySelector('span').oninput = () => saveChecklist(date);
+      div.querySelector('.del').onclick = () => { div.remove(); saveChecklist(date); };
+      div.ondragstart = e => e.dataTransfer.setData('text/plain', div.outerHTML);
+      div.ondragover = e => e.preventDefault();
+      div.ondrop = e => {
+        e.preventDefault();
+        const data = e.dataTransfer.getData('text/plain');
+        const temp = document.createElement('div');
+        temp.innerHTML = data;
+        const dragged = temp.firstChild;
+        div.parentNode.insertBefore(dragged, div);
+        saveChecklist(date);
+      };
       checklistContainer.appendChild(div);
-      saveChecklist();
     }
 
-    addChecklistBtn.addEventListener('click', () => createChecklistItem());
-    clearChecklistBtn.addEventListener('click', () => { if (confirm('Kosongkan semua?')) { checklistContainer.innerHTML = ''; saveChecklist(); } });
-    loadChecklist();
+    function loadChecklist(date) {
+      checklistContainer.innerHTML = '';
+      const data = JSON.parse(localStorage.getItem(getChecklistKey(date)) || '[]');
+      data.forEach(item => createChecklistItem(item.text, item.done, date));
+    }
 
-    setInterval(() => { notulenDate.textContent = `Notulen Tanggal: ${formatDateID()}`; }, 1000 * 60 * 30);
+    function saveChecklist(date) {
+      const items = [];
+      checklistContainer.querySelectorAll('.checklist-item').forEach(el => {
+        items.push({ text: el.querySelector('span').textContent, done: el.querySelector('input').checked });
+      });
+      localStorage.setItem(getChecklistKey(date), JSON.stringify(items));
+    }
+
+    document.getElementById('addChecklistBtn').onclick = () => createChecklistItem('Item baru', false, notulenDateSelect.value || today());
+    document.getElementById('clearChecklistBtn').onclick = () => {
+      if (confirm('Hapus semua ceklis?')) {
+        checklistContainer.innerHTML = '';
+        saveChecklist(notulenDateSelect.value || today());
+      }
+    };
+
+    notulenDateSelect.onchange = loadNotulenForDate;
+
+    // === AUTO SAVE & INIT ===
+    setInterval(saveAll, 5000);
+    window.onload = () => {
+      document.getElementById('date').value = today();
+      loadAll();
+      populateDateSelect();
+      loadNotulenForDate();
+    };
+
+    // === DARK MODE TOGGLE ===
+    document.getElementById('darkToggle').onclick = () => {
+      document.body.style.filter = document.body.style.filter ? '' : 'invert(1) hue-rotate(180deg)';
+    };
   </script>
 </body>
 </html>
