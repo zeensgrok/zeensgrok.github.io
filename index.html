@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Jurnal Forex Pro - Dollar / Cent</title>
+  <title>Jurnal Forex Pro - $ / ¢</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
     :root {
@@ -53,14 +53,14 @@
     .modal.active { display: flex; }
     .modal .box { max-width: 92%; max-height: 90%; background: var(--bg-panel); padding: 10px; border-radius: 8px; }
     .modal img { max-width: 100%; max-height: 80vh; display: block; border-radius: 6px; }
-    .currency-select { display: flex; gap: 10px; margin-bottom: 10px; justify-content: center; }
-    .currency-select label { display: flex; align-items: center; gap: 6px; font-weight: 600; cursor: pointer; }
-    .currency-select input[type="radio"] { transform: scale(1.3); }
+    .currency-select { display: flex; gap: 16px; margin-bottom: 12px; justify-content: center; font-weight: 700; font-size: 1.2rem; }
+    .currency-select label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+    .currency-select input[type="radio"] { transform: scale(1.4); }
     .filter-box { margin: 10px auto; max-width: 720px; text-align: center; }
     .filter-box input { width: 200px; display: inline-block; }
     .scroll-hint { text-align: center; font-size: 12px; color: #aaa; margin-bottom: 8px; }
     .dark-toggle { position: absolute; left: 20px; top: 16px; background: none; border: none; color: var(--accent); font-size: 20px; cursor: pointer; }
-    .rr-info { font-size: 12px; color: #00ff99; margin-top: 4px; text-align: center; }
+    .rr-info { font-size: 12px; color: #00ff99; margin-top: 4px; text-align: center; position: relative; }
     .add-btn { background: var(--accent-light); color: #000; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; cursor: pointer; }
     .notulen-wrap { max-width: 720px; margin: 0 auto; background: var(--bg-panel); padding: 18px; border-radius: 12px; }
     .notulen-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px; }
@@ -69,11 +69,16 @@
     .checklist h3 { margin: 0 0 8px; color: var(--accent); }
     .checklist-item { display: flex; align-items: center; gap: 8px; margin: 6px 0; }
     .import-excel { background: #0066cc !important; color: #fff !important; }
+    .download-template { background: #0066cc !important; color: #fff !important; }
+    .tooltip { position: relative; display: inline-block; }
+    .tooltip .tooltiptext { visibility: hidden; width: 180px; background: #333; color: #fff; text-align: center; border-radius: 6px; padding: 5px; position: absolute; z-index: 1; bottom: 125%; left: 50%; margin-left: -90px; opacity: 0; transition: opacity .2s; font-size: 11px; }
+    .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
     @media (max-width: 820px) {
       .main-title { font-size: 20px; } .dark-toggle { position: static; margin-bottom: 8px; }
       header { padding: 12px 10px; gap: 6px; } main { padding: 12px; }
       img.screenshot { width: 64px; height: 44px; } .table-container th, .table-container td { font-size: 12px; padding: 8px; }
       .tabs button { padding: 8px 12px; font-size: 14px; }
+      .currency-select { font-size: 1rem; gap: 12px; }
     }
   </style>
 </head>
@@ -86,15 +91,14 @@
       <button id="tabNotulen">NOTULEN</button>
     </div>
   </header>
-
   <main>
     <!-- JURNAL -->
     <section id="sectionJurnal" class="section active">
       <div class="risk-box">
         <h3 style="margin:0 0 8px 0; color:var(--accent)">Modal & Manajemen Risiko</h3>
         <div class="currency-select">
-          <label><input type="radio" name="currency" value="dollar" checked> $ Dollar</label>
-          <label><input type="radio" name="currency" value="cent"> Cent</label>
+          <label><input type="radio" name="currency" value="dollar" checked> $</label>
+          <label><input type="radio" name="currency" value="cent"> ¢</label>
         </div>
         <input type="number" id="modalAwal" placeholder="Modal awal" step="any" value="10000">
         <label for="riskSelect">Risk Per Trade (%)</label>
@@ -109,7 +113,6 @@
           <span class="value-box">Balance: <span id="balanceDisplay">10000.00</span> <span id="balanceUnit">$</span></span>
         </div>
       </div>
-
       <form id="jurnalForm" class="jurnal-form">
         <label for="date">Tanggal:</label>
         <input type="date" id="date" required>
@@ -139,7 +142,9 @@
             <input type="number" id="exitPrice" step="0.00001" required>
           </div>
         </div>
-        <div id="rrInfo" class="rr-info"></div>
+        <div id="rrInfo" class="rr-info tooltip">
+          <span class="tooltiptext">R:R = Profit / Risk</span>
+        </div>
         <label for="resultType">Hasil:</label>
         <select id="resultType" required>
           <option value="">-- Pilih Hasil --</option>
@@ -154,22 +159,19 @@
         <input type="file" id="screenshot" accept="image/*">
         <button type="submit" class="primary">Simpan Jurnal</button>
       </form>
-
       <div class="filter-box">
         <input type="date" id="filterDate">
         <button id="clearFilter" style="padding:6px 10px; margin-left:5px;">Clear</button>
       </div>
-
       <canvas id="profitChart"></canvas>
-
       <h2 style="text-align:center; color:var(--accent); margin:18px 0 8px;">Riwayat Transaksi</h2>
       <div class="scroll-hint">Geser untuk melihat kolom lainnya</div>
-
       <div class="table-container">
         <table id="historyTable">
           <thead>
             <tr>
               <th class="sticky-col"><input type="checkbox" id="selectAll"></th>
+              <th class="sticky-col">No.</th>
               <th class="sticky-col">Tanggal</th>
               <th class="sticky-col">Pair</th>
               <th class="sticky-col">Strategi</th>
@@ -186,13 +188,11 @@
           <tbody></tbody>
         </table>
       </div>
-
       <div class="action-panel">
         <label><input type="checkbox" id="selectAllBottom"> Pilih Semua</label>
         <button id="editSelected" class="add-btn">Edit Terpilih</button>
         <button id="deleteSelected" class="add-btn" style="background:#ff6666;color:#fff;">Hapus Terpilih</button>
       </div>
-
       <div class="totals">
         <h3 style="margin:6px 0 8px 0; color:var(--accent)">Statistik Akumulasi</h3>
         <span class="profit">Profit: <span id="totalProfit">0.00</span> <span id="profitUnit">$</span></span>
@@ -202,22 +202,20 @@
         <span>Rata-rata R:R: <span id="avgRR">0.00</span></span>
         <span>Net P&L: <span id="netResult">0.00</span> <span id="netUnit">$</span></span>
       </div>
-
       <div class="export-buttons">
+        <button id="downloadTemplate" class="download-template">Download Template Excel</button>
         <button id="exportExcel">Ekspor Excel</button>
         <button id="exportPDF">Ekspor PDF</button>
         <button id="importExcel" class="import-excel">Import Excel</button>
         <input type="file" id="importFile" accept=".xlsx,.xls" style="display:none;">
         <button id="clearAll" style="background:#ff6666;color:#fff;">Reset Semua</button>
       </div>
-
       <div class="backup-buttons">
         <button id="backupData">Backup JSON</button>
         <button id="restoreData">Restore dari File</button>
         <input type="file" id="restoreFile" accept=".json" style="display:none;">
       </div>
     </section>
-
     <!-- NOTULEN -->
     <section id="sectionNotulen" class="section">
       <div class="notulen-wrap">
@@ -241,7 +239,6 @@
       </div>
     </section>
   </main>
-
   <div id="imgModal" class="modal">
     <div class="box">
       <button id="closeModal" style="float:right;background:none;border:none;color:var(--accent);font-weight:700;cursor:pointer;">X</button>
@@ -253,8 +250,21 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.0/jspdf.plugin.autotable.min.js"></script>
-
   <script>
+    // === DOWNLOAD TEMPLATE EXCEL ===
+    document.getElementById('downloadTemplate').onclick = () => {
+      const data = [
+        ['Tanggal', 'Pair', 'Strategi', 'Lot', 'Entry', 'Exit', 'R:R', 'Hasil', 'P&L', 'Catatan'],
+        ['2025-11-05', 'XAU/USD', 'Breakout + RSI', '0.01', '2300.50', '2310.25', '1:2.5', 'Profit', '9.75', 'Entry di support harian'],
+        ['', '', '', '', '', '', '', '', '', ''],
+        ['', '', '', '', '', '', '', '', '', '']
+      ];
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Template Jurnal");
+      XLSX.writeFile(wb, `Template_Jurnal_Forex_${today()}.xlsx`);
+    };
+
     // === ELEMENTS ===
     const modalInput = document.getElementById('modalAwal');
     const riskSelect = document.getElementById('riskSelect');
@@ -279,11 +289,13 @@
     const pairSelect = document.getElementById('pair');
     const importFile = document.getElementById('importFile');
     const importExcelBtn = document.getElementById('importExcel');
+    const screenshotInput = document.getElementById('screenshot');
 
     // === STATE ===
     let modalAwal = 10000, totalProfit = 0, totalLoss = 0, totalTrades = 0, winTrades = 0, totalRR = 0;
     let isCent = false;
     let currentStreak = 0, maxStreak = 0;
+    let currentScreenshot = null;
 
     // === UTILS ===
     function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
@@ -295,7 +307,7 @@
       isCent = document.querySelector('input[name="currency"]:checked').value === 'cent';
       const sym = isCent ? '¢' : '$';
       Object.values(unitElements).forEach(el => el.textContent = sym);
-      document.querySelector('#historyTable th:nth-child(10)').textContent = `P&L (${sym})`;
+      document.querySelector('#historyTable th:nth-child(11)').textContent = `P&L (${sym})`;
       updateRisk();
     }
 
@@ -327,8 +339,8 @@
       const pipValue = isCent ? (isGold ? 0.01 : 0.001) : (isGold ? 1 : 0.1);
       let pl = lot * pips * pipValue * 100;
 
+      const shouldProfit = exit > entry;
       const isProfit = resultType.value === 'Profit';
-      const shouldProfit = (exit > entry);
       if ((isProfit && !shouldProfit) || (!isProfit && shouldProfit)) pl = -pl;
 
       amountInput.value = pl.toFixed(2);
@@ -358,7 +370,7 @@
         balance += pl;
         data.push(balance);
       });
-      chart.data.labels = ['Awal', ...getVisibleRows().map(r => r.cells[1].textContent)];
+      chart.data.labels = ['Awal', ...getVisibleRows().map(r => r.cells[2].textContent)];
       chart.data.datasets[0].data = data;
       chart.options.plugins.title.text = `Saldo Akun (${isCent ? '¢' : '$'})`;
       chart.update();
@@ -366,7 +378,16 @@
 
     function getVisibleRows() {
       const filter = document.getElementById('filterDate').value;
-      return Array.from(tbody.rows).filter(r => !filter || r.cells[1].textContent === filter);
+      return Array.from(tbody.rows).filter(r => !filter || r.cells[2].textContent === filter);
+    }
+
+    // === UPDATE NOMOR URUT ===
+    function updateRowNumbers() {
+      const rows = tbody.querySelectorAll('tr');
+      rows.forEach((row, index) => {
+        const noCell = row.cells[1];
+        if (noCell) noCell.textContent = (index + 1).toString();
+      });
     }
 
     // === SAVE / LOAD ===
@@ -384,10 +405,8 @@
       const cur = localStorage.getItem('currency') || 'dollar';
       document.querySelector(`input[value="${cur}"]`).checked = true;
       isCent = cur === 'cent';
-
       const saved = localStorage.getItem('jurnalHTML');
       if (saved) tbody.innerHTML = saved;
-
       const stats = JSON.parse(localStorage.getItem('stats') || '{}');
       totalProfit = stats.totalProfit || 0;
       totalLoss = stats.totalLoss || 0;
@@ -396,7 +415,6 @@
       totalRR = stats.totalRR || 0;
       currentStreak = stats.currentStreak || 0;
       maxStreak = stats.maxStreak || 0;
-
       updateCurrency();
       sortTable();
       updateStreak();
@@ -407,26 +425,29 @@
 
     // === SORT & STREAK ===
     function sortTable() {
-      const rows = Array.from(tbody.rows).sort((a, b) => a.cells[1].textContent.localeCompare(b.cells[1].textContent));
+      const rows = Array.from(tbody.rows).sort((a, b) => 
+        a.cells[2].textContent.localeCompare(b.cells[2].textContent)
+      );
       tbody.innerHTML = '';
       rows.forEach(r => tbody.appendChild(r));
+      updateRowNumbers();
     }
 
     function updateStreak() {
       const rows = Array.from(tbody.rows).reverse();
       let streak = 0;
       for (const row of rows) {
-        const res = row.cells[8].textContent;
-        if ((streak >= 0 && res === 'Profit') || (streak <= 0 && res === 'Loss')) {
-          streak += res === 'Profit' ? 1 : -1;
-        } else break;
+        const res = row.cells[9].textContent;
+        if (res === 'Profit') streak = streak >= 0 ? streak + 1 : 1;
+        else if (res === 'Loss') streak = streak <= 0 ? streak - 1 : -1;
+        else break;
       }
       currentStreak = Math.abs(streak);
       maxStreak = Math.max(maxStreak, currentStreak);
       updateRisk();
     }
 
-    // === IMPORT EXCEL (FIXED!) ===
+    // === IMPORT EXCEL ===
     importExcelBtn.onclick = () => importFile.click();
     importFile.onchange = e => {
       const file = e.target.files[0];
@@ -438,18 +459,14 @@
           const workbook = XLSX.read(data, { type: 'array' });
           const sheet = workbook.Sheets[workbook.SheetNames[0]];
           const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
           if (rows.length < 2) return alert('File Excel kosong!');
-
           const headers = rows[0].map(h => h.toString().toLowerCase().trim());
           const expected = ['tanggal', 'pair', 'strategi', 'lot', 'entry', 'exit', 'r:r', 'hasil', 'p&l', 'catatan'];
           if (!expected.every(col => headers.includes(col))) {
             return alert('Format salah! Kolom: Tanggal, Pair, Strategi, Lot, Entry, Exit, R:R, Hasil, P&L, Catatan');
           }
-
           const riskPerTrade = (modalAwal * parseFloat(riskSelect.value)) / 100;
           let imported = 0;
-
           for (let i = 1; i < rows.length; i++) {
             const r = rows[i];
             const idx = {
@@ -464,7 +481,6 @@
               pl: headers.indexOf('p&l'),
               notes: headers.indexOf('catatan')
             };
-
             const date = r[idx.date];
             const pair = r[idx.pair];
             const strategy = r[idx.strategy] || '';
@@ -474,18 +490,15 @@
             const pl = parseFloat(r[idx.pl]);
             const result = r[idx.result] === 'Profit' ? 'Profit' : 'Loss';
             const notes = r[idx.notes] || '';
-
             if (!date || !pair || isNaN(lot) || isNaN(entry) || isNaN(exit) || isNaN(pl)) continue;
-
             const rr = riskPerTrade > 0 ? Math.abs(pl) / riskPerTrade : 0;
-
             const row = document.createElement('tr');
             row.dataset.pl = pl;
             row.dataset.rr = rr;
             row.dataset.result = result;
-
             row.innerHTML = `
               <td class="sticky-col"><input type="checkbox" class="row-select"></td>
+              <td class="sticky-col"></td>
               <td class="sticky-col">${date}</td>
               <td class="sticky-col">${pair}</td>
               <td class="sticky-col">${escapeHtml(strategy)}</td>
@@ -498,16 +511,13 @@
               <td style="max-width:180px;white-space:pre-wrap;">${escapeHtml(notes)}</td>
               <td id="ssCell">-</td>
             `;
-
             tbody.appendChild(row);
             imported++;
-
             totalTrades++;
             if (result === 'Profit') { totalProfit += Math.abs(pl); winTrades++; }
             else totalLoss += Math.abs(pl);
             totalRR += rr;
           }
-
           sortTable();
           updateStreak();
           rebuildChart();
@@ -528,18 +538,16 @@
       e.preventDefault();
       const pl = parseFloat(amountInput.value);
       if (isNaN(pl)) return alert('P&L harus dihitung otomatis!');
-
       const risk = (modalAwal * parseFloat(riskSelect.value)) / 100;
       const rr = risk > 0 ? Math.abs(pl) / risk : 0;
       const result = resultType.value;
-
       const row = document.createElement('tr');
       row.dataset.pl = pl;
       row.dataset.rr = rr;
       row.dataset.result = result;
-
       row.innerHTML = `
         <td class="sticky-col"><input type="checkbox" class="row-select"></td>
+        <td class="sticky-col"></td>
         <td class="sticky-col">${document.getElementById('date').value}</td>
         <td class="sticky-col">${pairSelect.value}</td>
         <td class="sticky-col">${escapeHtml(document.getElementById('strategy').value)}</td>
@@ -552,8 +560,7 @@
         <td style="max-width:180px;white-space:pre-wrap;">${escapeHtml(document.getElementById('notes').value)}</td>
         <td id="ssCell">-</td>
       `;
-
-      const file = document.getElementById('screenshot').files[0];
+      const file = screenshotInput.files[0];
       if (file) {
         const reader = new FileReader();
         reader.onload = ev => {
@@ -585,28 +592,23 @@
     // === SELECT & BULK ACTIONS ===
     const selectAllHeader = document.getElementById('selectAll');
     const selectAllBottom = document.getElementById('selectAllBottom');
-
     function updateSelectAll() {
       const checkboxes = tbody.querySelectorAll('.row-select');
       const checked = Array.from(checkboxes).filter(c => c.checked);
       selectAllHeader.checked = checkboxes.length > 0 && checked.length === checkboxes.length;
       selectAllBottom.checked = selectAllHeader.checked;
     }
-
     selectAllHeader.onclick = () => {
       const checked = selectAllHeader.checked;
       tbody.querySelectorAll('.row-select').forEach(c => c.checked = checked);
       selectAllBottom.checked = checked;
     };
-
     selectAllBottom.onclick = () => selectAllHeader.click();
-
     document.getElementById('editSelected').onclick = () => {
       const checked = tbody.querySelectorAll('.row-select:checked');
       if (checked.length !== 1) return alert('Pilih EXACTLY 1 transaksi untuk diedit!');
       editRow(checked[0].closest('tr'));
     };
-
     document.getElementById('deleteSelected').onclick = () => {
       const checked = tbody.querySelectorAll('.row-select:checked');
       if (checked.length === 0) return alert('Pilih minimal 1 transaksi!');
@@ -617,21 +619,20 @@
       saveAll();
       updateSelectAll();
     };
-
     function editRow(row) {
       const c = row.cells;
-      document.getElementById('date').value = c[1].textContent;
-      document.getElementById('pair').value = c[2].textContent;
-      document.getElementById('strategy').value = c[3].textContent;
-      lotSize.value = c[4].textContent;
-      entryPrice.value = c[5].textContent;
-      exitPrice.value = c[6].textContent;
-      resultType.value = c[8].textContent;
+      document.getElementById('date').value = c[2].textContent;
+      document.getElementById('pair').value = c[3].textContent;
+      document.getElementById('strategy').value = c[4].textContent;
+      lotSize.value = c[5].textContent;
+      entryPrice.value = c[6].textContent;
+      exitPrice.value = c[7].textContent;
+      resultType.value = c[9].textContent;
       amountInput.value = row.dataset.pl;
-      document.getElementById('notes').value = c[10].textContent;
+      document.getElementById('notes').value = c[11].textContent;
+      currentScreenshot = row.querySelector('img.screenshot')?.src || null;
       deleteRow(row, false);
     }
-
     function deleteRow(row, confirmDelete = true) {
       if (confirmDelete && !confirm('Hapus transaksi ini?')) return;
       const pl = parseFloat(row.dataset.pl) || 0;
@@ -645,17 +646,16 @@
       rebuildChart();
       updateRisk();
       saveAll();
+      updateRowNumbers();
     }
 
-    // === EKSPOR, BACKUP, NOTULEN, INIT (tetap sama) ===
-    // ... (sama seperti versi sebelumnya, tidak ada perubahan)
-
+    // === EKSPOR, BACKUP, NOTULEN, INIT ===
     document.getElementById('exportExcel').onclick = () => {
       const data = [['Tanggal', 'Pair', 'Strategi', 'Lot', 'Entry', 'Exit', 'R:R', 'Hasil', 'P&L', 'Catatan']];
       tbody.querySelectorAll('tr').forEach(r => {
-        data.push([r.cells[1].textContent, r.cells[2].textContent, r.cells[3].textContent, r.cells[4].textContent,
-                   r.cells[5].textContent, r.cells[6].textContent, r.cells[7].textContent, r.cells[8].textContent,
-                   r.cells[9].textContent, r.cells[10].textContent]);
+        data.push([r.cells[2].textContent, r.cells[3].textContent, r.cells[4].textContent, r.cells[5].textContent,
+                   r.cells[6].textContent, r.cells[7].textContent, r.cells[8].textContent, r.cells[9].textContent,
+                   r.cells[10].textContent, r.cells[11].textContent]);
       });
       const ws = XLSX.utils.aoa_to_sheet(data);
       const wb = XLSX.utils.book_new();
@@ -669,9 +669,9 @@
       doc.text("Jurnal Forex Pro", 14, 15);
       doc.autoTable({
         head: [['Tanggal', 'Pair', 'Strategi', 'Lot', 'Entry', 'Exit', 'R:R', 'Hasil', 'P&L', 'Catatan']],
-        body: Array.from(tbody.rows).map(r => [r.cells[1].textContent, r.cells[2].textContent, r.cells[3].textContent, r.cells[4].textContent,
-                                              r.cells[5].textContent, r.cells[6].textContent, r.cells[7].textContent, r.cells[8].textContent,
-                                              r.cells[9].textContent, r.cells[10].textContent]),
+        body: Array.from(tbody.rows).map(r => [r.cells[2].textContent, r.cells[3].textContent, r.cells[4].textContent, r.cells[5].textContent,
+                                              r.cells[6].textContent, r.cells[7].textContent, r.cells[8].textContent, r.cells[9].textContent,
+                                              r.cells[10].textContent, r.cells[11].textContent]),
         startY: 25
       });
       doc.save(`Jurnal_Forex_${today()}.pdf`);
@@ -724,7 +724,6 @@
     const notulenArea = document.getElementById('notulenArea');
     const notulenDateSelect = document.getElementById('notulenDateSelect');
     const checklistContainer = document.getElementById('checklistContainer');
-
     function loadNotulen() {
       const dates = Object.keys(localStorage).filter(k => k.startsWith('notulen_')).map(k => k.replace('notulen_', '')).sort().reverse();
       notulenDateSelect.innerHTML = '<option value="">-- Pilih Tanggal --</option>' + dates.map(d => `<option value="${d}">${d}</option>`).join('');
@@ -736,7 +735,6 @@
         checklistContainer.innerHTML = '';
       }
     }
-
     function loadNotulenByDate(date) {
       if (!date) { notulenArea.value = ''; checklistContainer.innerHTML = ''; return; }
       const data = JSON.parse(localStorage.getItem(`notulen_${date}`) || '{}');
@@ -749,7 +747,6 @@
         </div>
       `).join('');
     }
-
     function saveNotulen() {
       const date = notulenDateSelect.value || today();
       const data = {
@@ -762,7 +759,6 @@
       localStorage.setItem(`notulen_${date}`, JSON.stringify(data));
       loadNotulen();
     }
-
     document.getElementById('saveNotulenBtn').onclick = saveNotulen;
     document.getElementById('newNotulenBtn').onclick = () => { notulenDateSelect.value = ''; notulenArea.value = ''; checklistContainer.innerHTML = ''; };
     document.getElementById('addChecklistBtn').onclick = () => {
@@ -796,7 +792,7 @@
     document.getElementById('clearFilter').onclick = () => { document.getElementById('filterDate').value = ''; rebuildChart(); };
     document.getElementById('filterDate').onchange = rebuildChart;
 
-    setInterval(saveAll, 5000);
+    setInterval(saveAll, 30000);
     window.onload = () => {
       document.getElementById('date').value = today();
       if (localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark');
