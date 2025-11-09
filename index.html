@@ -36,6 +36,37 @@
     .content {
       padding: 25px;
     }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 20px;
+    }
+    .tab {
+      padding: 12px 20px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #7f8c8d;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+    }
+    .tab.active {
+      color: #2c3e50;
+      border-bottom-color: #3498db;
+    }
+    .tab:hover:not(.active) {
+      color: #2c3e50;
+    }
+
+    /* Tab Content */
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+
     .form-group {
       margin-bottom: 15px;
     }
@@ -51,6 +82,9 @@
       border: 1px solid #ddd;
       border-radius: 6px;
       font-size: 1rem;
+    }
+    input[type="datetime-local"] {
+      font-family: inherit;
     }
     input:focus, select:focus {
       outline: none;
@@ -133,7 +167,7 @@
     .summary span {
       display: block;
       font-size: 1.5rem;
-      margin-top: 5px;
+      margin-top:  f5px;
     }
     .in { color: #27ae60; }
     .out { color: #e74c3c; }
@@ -152,6 +186,12 @@
       .actions button {
         width: 100%;
       }
+      .tabs {
+        flex-direction: column;
+      }
+      .tab {
+        text-align: center;
+      }
     }
   </style>
 </head>
@@ -162,23 +202,53 @@
     </header>
     <div class="content">
 
-      <!-- Form Input -->
-      <div class="form-group">
-        <label for="namaBarang">Nama Barang</label>
-        <input type="text" id="namaBarang" placeholder="Masukkan nama barang" />
+      <!-- Tabs -->
+      <div class="tabs">
+        <div class="tab active" data-tab="auto">Tanggal Otomatis</div>
+        <div class="tab" data-tab="manual">Tanggal Manual</div>
       </div>
 
-      <div class="form-group">
-        <label for="jumlah">Jumlah</label>
-        <input type="number" id="jumlah" min="1" placeholder="Masukkan jumlah" />
+      <!-- Tab Content: Otomatis -->
+      <div id="tab-auto" class="tab-content active">
+        <div class="form-group">
+          <label for="namaBarang">Nama Barang</label>
+          <input type="text" id="namaBarang" placeholder="Masukkan nama barang" />
+        </div>
+        <div class="form-group">
+          <label for="jumlah">Jumlah</label>
+          <input type="number" id="jumlah" min="1" placeholder="Masukkan jumlah" />
+        </div>
+        <div class="form-group">
+          <label for="tipeTransaksi">Tipe Transaksi</label>
+          <select id="tipeTransaksi">
+            <option value="masuk">Barang Masuk</option>
+            <option value="keluar">Barang Keluar</option>
+          </select>
+        </div>
+        <p class="info">Tanggal & jam akan diisi otomatis saat disimpan.</p>
       </div>
 
-      <div class="form-group">
-        <label for="tipeTransaksi">Tipe Transaksi</label>
-        <select id="tipeTransaksi">
-          <option value="masuk">Barang Masuk</option>
-          <option value="keluar">Barang Keluar</option>
-        </select>
+      <!-- Tab Content: Manual -->
+      <div id="tab-manual" class="tab-content">
+        <div class="form-group">
+          <label for="namaBarangManual">Nama Barang</label>
+          <input type="text" id="namaBarangManual" placeholder="Masukkan nama barang" />
+        </div>
+        <div class="form-group">
+          <label for="jumlahManual">Jumlah</label>
+          <input type="number" id="jumlahManual" min="1" placeholder="Masukkan jumlah" />
+        </div>
+        <div class="form-group">
+          <label for="tipeManual">Tipe Transaksi</label>
+          <select id="tipeManual">
+            <option value="masuk">Barang Masuk</option>
+            <option value="keluar">Barang Keluar</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="tanggalManual">Tanggal & Jam</label>
+          <input type="datetime-local" id="tanggalManual" />
+        </div>
       </div>
 
       <button id="tambahBtn">Tambah Transaksi</button>
@@ -210,12 +280,10 @@
             <th>Tanggal</th>
           </tr>
         </thead>
-        <tbody>
-          <!-- Data diisi oleh JS -->
-        </tbody>
+        <tbody></tbody>
       </table>
 
-      <!-- Aksi Edit & Hapus (di bawah tabel) -->
+      <!-- Aksi Edit & Hapus -->
       <div class="actions">
         <button id="editBtn" class="btn-warning" disabled>Edit Transaksi</button>
         <button id="hapusBtn" class="btn-danger" disabled>Hapus Transaksi</button>
@@ -226,25 +294,57 @@
   </div>
 
   <script>
-    // Elemen
-    const namaInput = document.getElementById('namaBarang');
-    const jumlahInput = document.getElementById('jumlah');
-    const tipeSelect = document.getElementById('tipeTransaksi');
+    // === ELEMENTS ===
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.tab-content');
     const tambahBtn = document.getElementById('tambahBtn');
     const editBtn = document.getElementById('editBtn');
     const hapusBtn = document.getElementById('hapusBtn');
     const infoPilihan = document.getElementById('infoPilihan');
     const tbody = document.querySelector('#tabelRiwayat tbody');
+
+    // Form Otomatis
+    const namaInput = document.getElementById('namaBarang');
+    const jumlahInput = document.getElementById('jumlah');
+    const tipeSelect = document.getElementById('tipeTransaksi');
+
+    // Form Manual
+    const namaManual = document.getElementById('namaBarangManual');
+    const jumlahManual = document.getElementById('jumlahManual');
+    const tipeManual = document.getElementById('tipeManual');
+    const tanggalManual = document.getElementById('tanggalManual');
+
+    // Summary
     const totalMasukSpan = document.getElementById('totalMasuk');
     const totalKeluarSpan = document.getElementById('totalKeluar');
     const stokSaatIniSpan = document.getElementById('stokSaatIni');
 
-    // State
+    // === STATE ===
     let transaksi = JSON.parse(localStorage.getItem('transaksi')) || [];
     let selectedIndex = -1;
     let isEditing = false;
+    let activeTab = 'auto';
 
-    // Render tabel
+    // === TAB SWITCHING ===
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const target = tab.dataset.tab;
+        if (target === activeTab) return;
+
+        // Update tabs
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        // Update content
+        tabContents.forEach(c => c.classList.remove('active'));
+        document.getElementById(`tab-${target}`).classList.add('active');
+
+        activeTab = target;
+        resetForm();
+      });
+    });
+
+    // === RENDER TABEL ===
     function render() {
       tbody.innerHTML = '';
       let totalMasuk = 0;
@@ -264,43 +364,39 @@
           </td>
           <td>${formatTanggal(item.tanggal)}</td>
         `;
-        // Klik baris
         row.addEventListener('click', () => pilihBaris(index, row));
         if (index === selectedIndex) row.classList.add('selected');
         tbody.appendChild(row);
       });
 
-      // Update ringkasan
-      const stokSaatIni = totalMasuk - totalKeluar;
+      const stok = totalMasuk - totalKeluar;
       totalMasukSpan.textContent = totalMasuk;
       totalKeluarSpan.textContent = totalKeluar;
-      stokSaatIniSpan.textContent = stokSaatIni;
+      stokSaatIniSpan.textContent = stok;
+      stokSaatIniSpan.style.color = stok < 0 ? '#e74c3c' : '#3498db';
 
-      stokSaatIniSpan.style.color = stokSaatIni < 0 ? '#e74c3c' : '#3498db';
-
-      // Update tombol aksi
       updateAksiButtons();
-
       localStorage.setItem('transaksi', JSON.stringify(transaksi));
     }
 
-    // Pilih baris
-    function pilihBaris(index, rowElement) {
+    // === PILIH BARIS ===
+    function pilihBaris(index, row) {
       selectedIndex = index;
-      document.querySelectorAll('tr').forEach(r => r.classList.remove('selected'));
-      rowElement.classList.add('selected');
-      infoPilihan.textContent = `Terpilih: "${transaksi[index].nama}" - ${transaksi[index].jumlah} (${transaksi[index].tipe})`;
+      document.querySelectorAll('tbody tr').forEach(r => r.classList.remove('selected'));
+      row.classList.add('selected');
+      const item = transaksi[index];
+      infoPilihan.textContent = `Terpilih: "${item.nama}" - ${item.jumlah} (${item.tipe})`;
       updateAksiButtons();
     }
 
-    // Update status tombol
+    // === UPDATE TOMBOL AKSI ===
     function updateAksiButtons() {
       const adaPilihan = selectedIndex >= 0;
       editBtn.disabled = !adaPilihan || isEditing;
       hapusBtn.disabled = !adaPilihan || isEditing;
     }
 
-    // Format tanggal
+    // === FORMAT TANGGAL ===
     function formatTanggal(dateString) {
       const date = new Date(dateString);
       return date.toLocaleString('id-ID', {
@@ -309,11 +405,26 @@
       });
     }
 
-    // Simpan (tambah/edit)
+    // === SIMPAN TRANSAKSI ===
     function simpanTransaksi() {
-      const nama = namaInput.value.trim();
-      const jumlah = parseInt(jumlahInput.value);
-      const tipe = tipeSelect.value;
+      let nama, jumlah, tipe, tanggal;
+
+      if (activeTab === 'auto') {
+        nama = namaInput.value.trim();
+        jumlah = parseInt(jumlahInput.value);
+        tipe = tipeSelect.value;
+        tanggal = new Date().toISOString();
+      } else {
+        nama = namaManual.value.trim();
+        jumlah = parseInt(jumlahManual.value);
+        tipe = tipeManual.value;
+        const manualDate = tanggalManual.value;
+        if (!manualDate) {
+          alert('Pilih tanggal dan jam!');
+          return;
+        }
+        tanggal = new Date(manualDate).toISOString();
+      }
 
       if (!nama || isNaN(jumlah) || jumlah <= 0) {
         alert('Harap isi nama barang dan jumlah dengan benar!');
@@ -322,16 +433,14 @@
 
       // Cek stok jika keluar
       if (tipe === 'keluar' && !isEditing) {
-        const totalMasuk = transaksi.filter(t => t.tipe === 'masuk').reduce((a, b) => a + b.jumlah, 0);
-        const totalKeluar = transaksi.filter(t => t.tipe === 'keluar').reduce((a, b) => a + b.jumlah, 0);
-        if (totalMasuk - totalKeluar < jumlah) {
-          if (!confirm(`Stok saat ini: ${totalMasuk - totalKeluar}. Akan keluar: ${jumlah}. Stok akan negatif. Lanjutkan?`)) {
-            return;
-          }
+        const masuk = transaksi.filter(t => t.tipe === 'masuk').reduce((a,b) => a + b.jumlah, 0);
+        const keluar = transaksi.filter(t => t.tipe === 'keluar').reduce((a,b) => a + b.jumlah, 0);
+        if (masuk - keluar < jumlah) {
+          if (!confirm(`Stok saat ini: ${masuk - keluar}. Keluar: ${jumlah}. Stok akan negatif. Lanjutkan?`)) return;
         }
       }
 
-      const data = { nama, jumlah, tipe, tanggal: new Date().toISOString() };
+      const data = { nama, jumlah, tipe, tanggal };
 
       if (isEditing && selectedIndex >= 0) {
         transaksi[selectedIndex] = data;
@@ -345,33 +454,49 @@
       render();
     }
 
-    // Mulai edit
+    // === EDIT ===
     editBtn.addEventListener('click', () => {
       if (selectedIndex < 0) return;
       const item = transaksi[selectedIndex];
-      namaInput.value = item.nama;
-      jumlahInput.value = item.jumlah;
-      tipeSelect.value = item.tipe;
+
+      if (activeTab === 'auto') {
+        namaInput.value = item.nama;
+        jumlahInput.value = item.jumlah;
+        tipeSelect.value = item.tipe;
+      } else {
+        namaManual.value = item.nama;
+        jumlahManual.value = item.jumlah;
+        tipeManual.value = item.tipe;
+        tanggalManual.value = item.tanggal.slice(0, 16); // format datetime-local
+      }
+
       isEditing = true;
       tambahBtn.textContent = 'Update Transaksi';
       infoPilihan.textContent = `Sedang mengedit: "${item.nama}"`;
       updateAksiButtons();
     });
 
-    // Hapus
+    // === HAPUS ===
     hapusBtn.addEventListener('click', () => {
-      if (selectedIndex < 0 || !confirm('Yakin ingin menghapus transaksi ini?')) return;
+      if (selectedIndex < 0 || !confirm('Yakin ingin menghapus?')) return;
       transaksi.splice(selectedIndex, 1);
       selectedIndex = -1;
       resetForm();
       render();
     });
 
-    // Reset form
+    // === RESET FORM ===
     function resetForm() {
-      namaInput.value = '';
-      jumlahInput.value = '';
-      tipeSelect.value = 'masuk';
+      if (activeTab === 'auto') {
+        namaInput.value = '';
+        jumlahInput.value = '';
+        tipeSelect.value = 'masuk';
+      } else {
+        namaManual.value = '';
+        jumlahManual.value = '';
+        tipeManual.value = 'masuk';
+        tanggalManual.value = '';
+      }
       isEditing = false;
       tambahBtn.textContent = 'Tambah Transaksi';
       infoPilihan.textContent = 'Klik baris di tabel untuk memilih transaksi.';
@@ -379,12 +504,19 @@
       updateAksiButtons();
     }
 
-    // Event: Tambah / Update
+    // === EVENT LISTENERS ===
     tambahBtn.addEventListener('click', simpanTransaksi);
-    jumlahInput.addEventListener('keypress', e => e.key === 'Enter' && simpanTransaksi());
+    [jumlahInput, jumlahManual].forEach(input => {
+      input?.addEventListener('keypress', e => e.key === 'Enter' && simpanTransaksi());
+    });
 
-    // Inisialisasi
+    // === INIT ===
     render();
+
+    // Set default tanggal manual ke sekarang
+    const now = new Date();
+    const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+    tanggalManual.value = local.toISOString().slice(0, 16);
   </script>
 </body>
 </html>
