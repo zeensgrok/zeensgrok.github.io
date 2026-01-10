@@ -2,92 +2,106 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Free or Die Hard (2007)</title>
+    <title>Kalkulator Sederhana</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: #141414;
-            color: #fff;
-            margin: 0;
+            background: #f2f2f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .calculator {
+            background: #fff;
             padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            width: 260px;
         }
-        .container {
-            max-width: 800px;
-            margin: 40px auto;
-            background: #222;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.6);
-        }
-        .header {
-            background: linear-gradient(to right, #e50914, #b20710);
-            padding: 30px;
-            text-align: center;
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 2.5em;
-        }
-        .content {
-            padding: 30px;
-            line-height: 1.6;
+        .calculator input {
+            width: 100%;
+            height: 50px;
+            font-size: 22px;
+            margin-bottom: 10px;
+            text-align: right;
+            padding-right: 10px;
         }
         .buttons {
-            text-align: center;
-            margin: 30px 0;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
         }
-        .btn {
-            display: inline-block;
-            padding: 15px 30px;
-            margin: 10px;
-            background: #e50914;
+        button {
+            height: 45px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .operator {
+            background: #ff9800;
             color: white;
-            text-decoration: none;
-            font-size: 1.2em;
-            border-radius: 8px;
-            transition: 0.3s;
         }
-        .btn:hover {
-            background: #ff0a16;
-            transform: scale(1.05);
+        .clear {
+            background: #f44336;
+            color: white;
         }
-        .warning {
-            background: #440000;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 20px 0;
-            font-size: 0.9em;
+        .equal {
+            background: #4caf50;
+            color: white;
+            grid-column: span 2;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <h1>Live Free or Die Hard</h1>
-        <p>2007 • Aksi / Thriller • 2 jam 9 menit</p>
-    </div>
+<div class="calculator">
+    <input type="text" id="display" disabled>
 
-    <div class="content">
-        <p><strong>Sinopsis:</strong><br>
-        John McClane (Bruce Willis) dan seorang hacker muda berusaha menghentikan kelompok teroris cyber yang ingin melumpuhkan seluruh infrastruktur Amerika Serikat.</p>
+    <div class="buttons">
+        <button class="clear" onclick="clearDisplay()">C</button>
+        <button onclick="appendValue('/')">/</button>
+        <button onclick="appendValue('*')">×</button>
+        <button onclick="appendValue('-')">-</button>
 
-        <div class="buttons">
-            <a href="https://tv.lk21official.app/live-free-die-hard-2007/" target="_blank" class="btn">
-                Nonton Streaming
-            </a>
-            <a href="https://tv.lk21official.app/live-free-die-hard-2007/" target="_blank" class="btn">
-                Download Film
-            </a>
-        </div>
+        <button onclick="appendValue('7')">7</button>
+        <button onclick="appendValue('8')">8</button>
+        <button onclick="appendValue('9')">9</button>
+        <button onclick="appendValue('+')">+</button>
 
-        <div class="warning">
-            <strong>Catatan:</strong> Link di atas mengarah ke situs pihak ketiga (lk21official) yang menyediakan konten bajakan. 
-            Gunakan dengan risiko sendiri dan lebih disarankan menonton melalui platform legal seperti Netflix, Disney+, atau Prime Video.
-        </div>
+        <button onclick="appendValue('4')">4</button>
+        <button onclick="appendValue('5')">5</button>
+        <button onclick="appendValue('6')">6</button>
+        <button onclick="appendValue('.')">.</button>
+
+        <button onclick="appendValue('1')">1</button>
+        <button onclick="appendValue('2')">2</button>
+        <button onclick="appendValue('3')">3</button>
+        <button class="equal" onclick="calculate()">=</button>
+
+        <button onclick="appendValue('0')">0</button>
     </div>
 </div>
+
+<script>
+    function appendValue(value) {
+        document.getElementById("display").value += value;
+    }
+
+    function clearDisplay() {
+        document.getElementById("display").value = "";
+    }
+
+    function calculate() {
+        try {
+            let result = eval(document.getElementById("display").value);
+            document.getElementById("display").value = result;
+        } catch {
+            document.getElementById("display").value = "Error";
+        }
+    }
+</script>
 
 </body>
 </html>
