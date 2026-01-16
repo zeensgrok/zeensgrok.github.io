@@ -6,81 +6,69 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-*{
-    box-sizing:border-box;
-}
+*{box-sizing:border-box}
 body{
-    font-family: Arial, sans-serif;
-    background:#eaf2ff;
+    font-family:"Segoe UI",Arial,sans-serif;
+    background:linear-gradient(135deg,#eaf2ff,#f6f9ff);
     margin:0;
     padding:16px;
 }
 .card{
     background:#fff;
-    border-radius:12px;
-    padding:16px;
-    box-shadow:0 6px 14px rgba(0,0,0,.12);
+    border-radius:14px;
+    padding:18px;
+    box-shadow:0 8px 18px rgba(0,0,0,.1);
     margin-bottom:16px;
 }
 label{
     font-weight:600;
     font-size:14px;
-    margin-top:12px;
+    margin-top:14px;
     display:block;
 }
-input, select{
+input,select{
     width:100%;
-    padding:12px;
+    padding:13px;
     margin-top:6px;
     border:1px solid #d0d7e2;
-    border-radius:8px;
+    border-radius:10px;
     font-size:14px;
 }
-input[readonly]{
-    background:#f5f7fb;
+input[readonly]{background:#f5f7fb}
+.center{
+    text-align:center;
+    font-weight:600;
+    margin:12px 0;
 }
 .buttons{
     display:flex;
     gap:12px;
-    margin:16px 0;
+    margin-bottom:18px;
 }
 button{
     flex:1;
     padding:14px;
     border:none;
-    border-radius:10px;
+    border-radius:12px;
     font-size:15px;
     font-weight:600;
     color:#fff;
+    cursor:pointer;
 }
-.green{background:#28a745;}
-.red{background:#dc3545;}
-
-.center{
-    text-align:center;
-    font-weight:600;
-    margin-bottom:10px;
-    font-size:15px;
-}
-.history{
-    padding:0;
-}
+.green{background:#28a745}
+.red{background:#dc3545}
+.green:active,.red:active{transform:scale(.97)}
 .history div{
     padding:12px 14px;
     border-bottom:1px solid #eee;
     font-size:14px;
+    cursor:pointer;
 }
-.history div:last-child{
-    border-bottom:none;
-}
-h4{
-    margin:0 0 8px 4px;
-    font-size:15px;
-}
+.history div:last-child{border-bottom:none}
 .footer{
     text-align:center;
     font-size:12px;
-    color:#666;
+    color:#777;
     margin-top:20px;
 }
 </style>
@@ -134,43 +122,42 @@ function randomText(len){
     return res;
 }
 
+function copyToClipboard(text){
+    navigator.clipboard.writeText(text);
+}
+
 function renderHistory(){
     const historyEl = document.getElementById("history");
     historyEl.innerHTML = "";
-
-    const lastFive = historyData.slice(-MAX_VIEW).reverse();
-    lastFive.forEach(email=>{
-        const div = document.createElement("div");
-        div.textContent = email;
+    historyData.slice(-MAX_VIEW).reverse().forEach(email=>{
+        const div=document.createElement("div");
+        div.textContent=email;
+        div.onclick=()=>copyToClipboard(email);
         historyEl.appendChild(div);
     });
 }
 
 function mulai(){
     const len = document.getElementById("length").value;
-    const domain = document.getElementById("domain").value;
+    if(len < 3){alert("Minimal 3 huruf");return;}
 
-    if(len < 3){
-        alert("Jumlah huruf minimal 3");
-        return;
-    }
-
-    const email = randomText(len) + domain;
+    const email = randomText(len) + document.getElementById("domain").value;
     document.getElementById("result").value = email;
+
+    copyToClipboard(email);
 
     historyData.push(email);
     total++;
     document.getElementById("total").textContent = total;
-
     renderHistory();
 }
 
 function reset(){
-    document.getElementById("result").value = "";
-    document.getElementById("history").innerHTML = "";
-    historyData = [];
-    total = 0;
-    document.getElementById("total").textContent = total;
+    document.getElementById("result").value="";
+    document.getElementById("history").innerHTML="";
+    historyData=[];
+    total=0;
+    document.getElementById("total").textContent=0;
 }
 </script>
 
