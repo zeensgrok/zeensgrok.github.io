@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <title>Email Generator</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
 *{box-sizing:border-box}
 body{
@@ -101,63 +100,97 @@ button{
     <button class="red" onclick="reset()">Reset</button>
 </div>
 
-<h4>Log History (5 terakhir)</h4>
+<h4>Log History</h4>
 <div class="card history" id="history"></div>
 
 <div class="footer">
-    Versi 4.2.3-beta • Build 2025
+    Versi 4.3.0 • Persistent Mode
 </div>
 
 <script>
-let total = 0;
 const MAX_VIEW = 5;
-let historyData = [];
+let historyData = JSON.parse(localStorage.getItem("email_history")) || [];
+let total = parseInt(localStorage.getItem("email_total")) || 0;
+let lock = false;
+
+document.getElementById("total").textContent = total;
+renderHistory();
 
 function randomText(len){
-    const chars = "abcdefghijklmnopqrstuvwxyz";
+    const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
     let res = "";
     for(let i=0;i<len;i++){
-        res += chars[Math.floor(Math.random()*chars.length)];
+        res += chars.charAt(Math.floor(Math.random()*chars.length));
     }
     return res;
 }
 
 function copyToClipboard(text){
-    navigator.clipboard.writeText(text);
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(text);
+    } else {
+        const temp = document.createElement("textarea");
+        temp.value = text;
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand("copy");
+        document.body.removeChild(temp);
+    }
+}
+
+function saveData(){
+    localStorage.setItem("email_history", JSON.stringify(historyData));
+    localStorage.setItem("email_total", total);
 }
 
 function renderHistory(){
     const historyEl = document.getElementById("history");
     historyEl.innerHTML = "";
     historyData.slice(-MAX_VIEW).reverse().forEach(email=>{
-        const div=document.createElement("div");
-        div.textContent=email;
-        div.onclick=()=>copyToClipboard(email);
+        const div = document.createElement("div");
+        div.textContent = email;
+        div.onclick = () => copyToClipboard(email);
         historyEl.appendChild(div);
     });
 }
 
 function mulai(){
-    const len = document.getElementById("length").value;
-    if(len < 3){alert("Minimal 3 huruf");return;}
+    if(lock) return;
+    lock = true;
+
+    const len = parseInt(document.getElementById("length").value);
+    if(len < 3){
+        alert("Minimal 3 karakter");
+        lock = false;
+        return;
+    }
 
     const email = randomText(len) + document.getElementById("domain").value;
     document.getElementById("result").value = email;
-
     copyToClipboard(email);
 
     historyData.push(email);
     total++;
+
+    saveData();
     document.getElementById("total").textContent = total;
     renderHistory();
+
+    setTimeout(()=>lock=false, 200);
 }
 
 function reset(){
-    document.getElementById("result").value="";
-    document.getElementById("history").innerHTML="";
-    historyData=[];
-    total=0;
-    document.getElementById("total").textContent=0;
+    if(!confirm("Reset semua data?")) return;
+
+    localStorage.removeItem("email_history");
+    localStorage.removeItem("email_total");
+
+    historyData = [];
+    total = 0;
+
+    document.getElementById("result").value = "";
+    document.getElementById("history").innerHTML = "";
+    document.getElementById("total").textContent = 0;
 }
 </script>
 
